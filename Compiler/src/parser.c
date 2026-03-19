@@ -10,6 +10,7 @@ FILE *src;
 
 void advance() {
     current_token = get_next_token(src);
+    // printf("Token: %d\n", current_token.type); // DEBUG
 }
 
 void error(const char *msg) {
@@ -159,12 +160,14 @@ ASTNode* parse_statement() {
 
 ASTNode* parse(FILE *source) {
 
+    // printf("Entered parser\n");
+
     src = source;
     advance();
 
     while (current_token.type != TOKEN_EOF) {
 
-        printf("Parsing statement...\n"); // DEBUG
+        // printf("Parsing statement...\n"); // DEBUG
 
         ASTNode* stmt = parse_statement();
 
