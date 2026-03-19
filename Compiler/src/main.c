@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include "../include/parser.h"
+#include "../include/ast.h"
 
 int main(int argc, char *argv[]) {
-
-    printf("Program started\n");
 
     if (argc < 2) {
         printf("Usage: %s <file>\n", argv[0]);
@@ -20,7 +19,8 @@ int main(int argc, char *argv[]) {
     ASTNode* root = parse(source);
 
     if (root) {
-        printf("Parsing successful\n");
+        printf("\n=== AST ===\n");
+        print_ast(root, 0);
     } else {
         printf("Parsing failed\n");
     }

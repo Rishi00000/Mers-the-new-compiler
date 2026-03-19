@@ -36,25 +36,31 @@ ASTNode* parse_variable() {
 // ---------- EXPRESSIONS ----------
 
 ASTNode* parse_expression() {
+
     ASTNode* left;
 
+    // First operand
     if (current_token.type == TOKEN_NUMBER)
         left = parse_number();
     else
         left = parse_variable();
 
-    if (current_token.type == TOKEN_MINUS) { // your addition
+    // Handle multiple operators
+    while (current_token.type == TOKEN_MINUS) {
+
         ASTNode* node = create_node(AST_BINARY);
-        advance();
+
+        advance(); // consume operator
 
         node->left = left;
 
+        // Right operand
         if (current_token.type == TOKEN_NUMBER)
             node->right = parse_number();
         else
             node->right = parse_variable();
 
-        return node;
+        left = node; // IMPORTANT: chaining
     }
 
     return left;
@@ -160,14 +166,15 @@ ASTNode* parse_statement() {
 
 ASTNode* parse(FILE *source) {
 
-    // printf("Entered parser\n");
-
     src = source;
     advance();
 
-    while (current_token.type != TOKEN_EOF) {
+    ASTNode* program = create_node(AST_PROGRAM);
 
-        // printf("Parsing statement...\n"); // DEBUG
+    ASTNode* head = NULL;
+    ASTNode* current = NULL;
+
+    while (current_token.type != TOKEN_EOF) {
 
         ASTNode* stmt = parse_statement();
 
@@ -175,7 +182,16 @@ ASTNode* parse(FILE *source) {
             printf("Statement parsing failed\n");
             return NULL;
         }
+
+        if (!head) {
+            head = stmt;
+            current = stmt;
+        } else {
+            current->next = stmt;
+            current = stmt;
+        }
     }
 
-    return (ASTNode*)1; // temporary success
+    program->left = head; // attach statements to program
+    return program;
 }
