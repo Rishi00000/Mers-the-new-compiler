@@ -1,10 +1,9 @@
 #include <stdio.h>
-#include "../include/lexer.h"
-#include "../include/token.h"
-
-extern const char* token_type_to_string(TokenType type);
+#include "../include/parser.h"
 
 int main(int argc, char *argv[]) {
+
+    printf("Program started\n");
 
     if (argc < 2) {
         printf("Usage: %s <file>\n", argv[0]);
@@ -14,23 +13,17 @@ int main(int argc, char *argv[]) {
     FILE *source = fopen(argv[1], "r");
 
     if (!source) {
-        printf("Error: Cannot open file\n");
+        printf("Error opening file\n");
         return 1;
     }
 
-    Token token;
+    ASTNode* root = parse(source);
 
-    do {
-        token = get_next_token(source);
-
-        printf("%s", token_type_to_string(token.type));
-
-        if (token.type == TOKEN_IDENTIFIER || token.type == TOKEN_NUMBER)
-            printf("(%s)", token.value);
-
-        printf("\n");
-
-    } while (token.type != TOKEN_EOF);
+    if (root) {
+        printf("Parsing successful\n");
+    } else {
+        printf("Parsing failed\n");
+    }
 
     fclose(source);
     return 0;
