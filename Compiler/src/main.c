@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "../include/parser.h"
 #include "../include/ast.h"
+#include "../include/semantic.h"
 
 int main(int argc, char *argv[]) {
 
@@ -21,8 +22,9 @@ int main(int argc, char *argv[]) {
     if (root) {
         printf("\n=== AST ===\n");
         print_ast(root, 0);
-    } else {
-        printf("Parsing failed\n");
+
+        printf("\n=== Semantic Analysis ===\n");
+        analyze(root);
     }
 
     fclose(source);
