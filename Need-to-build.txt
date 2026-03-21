@@ -1,9 +1,3 @@
-
-
-
-
-
-
 Stages:
 
 1) Token System
@@ -14,4 +8,3 @@ Stages:
 6) Semantic analysis
 7) Intermediate representation 
 8) Code generation
-9) Build a executable file
