@@ -2,6 +2,7 @@
 #include "../include/parser.h"
 #include "../include/ast.h"
 #include "../include/semantic.h"
+#include "../include/ir.h"
 
 int main(int argc, char *argv[]) {
 
@@ -25,6 +26,9 @@ int main(int argc, char *argv[]) {
 
         printf("\n=== Semantic Analysis ===\n");
         analyze(root);
+
+        printf("\n=== IR ===\n");
+        generate_ir(root);
     }
 
     fclose(source);
