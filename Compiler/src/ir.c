@@ -11,7 +11,7 @@ char* new_temp() {
 }
 
 // recursive expression handling
-char* generate_expr(ASTNode* node) {
+char* generate_ir_expr(ASTNode* node) {
 
     if (node->type == AST_NUMBER) {
         char* temp = new_temp();
@@ -24,8 +24,8 @@ char* generate_expr(ASTNode* node) {
     }
 
     if (node->type == AST_BINARY) {
-        char* left = generate_expr(node->left);
-        char* right = generate_expr(node->right);
+        char* left = generate_ir_expr(node->left);
+        char* right = generate_ir_expr(node->right);
 
         char* temp = new_temp();
 
@@ -37,20 +37,20 @@ char* generate_expr(ASTNode* node) {
 }
 
 // statement handling
-void generate_stmt(ASTNode* node) {
+void generate_ir_stmt(ASTNode* node) {
 
     if (!node) return;
 
     switch(node->type) {
 
         case AST_ASSIGNMENT: {
-            char* result = generate_expr(node->left);
+            char* result = generate_ir_expr(node->left);
             printf("%s = %s\n", node->name, result);
             break;
         }
 
         case AST_PRINT: {
-            char* result = generate_expr(node->left);
+            char* result = generate_ir_expr(node->left);
             printf("print %s\n", result);
             break;
         }
@@ -66,7 +66,7 @@ void generate_ir(ASTNode* root) {
     ASTNode* current = root->left;
 
     while (current) {
-        generate_stmt(current);
+        generate_ir_stmt(current);
         current = current->next;
     }
 }
