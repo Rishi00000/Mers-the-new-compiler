@@ -29,6 +29,21 @@ void check_node(ASTNode* node) {
             }
             break;
 
+        case AST_COMPARISON:
+            // Check both sides of comparison
+            check_node(node->left);
+            check_node(node->right);
+            return; // Skip default traversal for comparison
+
+        case AST_IF:
+            // Check condition
+            check_node(node->condition);
+            // Check true branch
+            check_node(node->true_branch);
+            // Check false branch
+            check_node(node->false_branch);
+            return; // Skip default traversal for if
+
         default:
             break;
     }

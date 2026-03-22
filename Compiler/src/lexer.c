@@ -39,6 +39,12 @@ Token get_next_token(FILE *source) {
             if (strcmp(buffer, "print") == 0)
                 return create_token(TOKEN_PRINT, buffer);
 
+            if (strcmp(buffer, "if") == 0)
+                return create_token(TOKEN_IF, buffer);
+
+            if (strcmp(buffer, "else") == 0)
+                return create_token(TOKEN_ELSE, buffer);
+
             return create_token(TOKEN_IDENTIFIER, buffer);
         }
 
@@ -58,14 +64,51 @@ Token get_next_token(FILE *source) {
             return create_token(TOKEN_NUMBER, buffer);
         }
 
-        // ASSIGN <-
+        // ASSIGN <- or comparison <, <=
         if (c == '<') {
             int next = fgetc(source);
-            if (next == '-')
+            if (next == '-') {
                 return create_token(TOKEN_ASSIGN, "<-");
+            } else if (next == '=') {
+                return create_token(TOKEN_LE, "<=");
+            } else {
+                ungetc(next, source);
+                return create_token(TOKEN_LT, "<");
+            }
+        }
 
-            printf("Lexer Error: Expected '-' after '<'\n");
-            return create_token(TOKEN_UNKNOWN, "");
+        // Greater than > or >=
+        if (c == '>') {
+            int next = fgetc(source);
+            if (next == '=') {
+                return create_token(TOKEN_GE, ">=");
+            } else {
+                ungetc(next, source);
+                return create_token(TOKEN_GT, ">");
+            }
+        }
+
+        // Equality == or inequality !=
+        if (c == '=') {
+            int next = fgetc(source);
+            if (next == '=') {
+                return create_token(TOKEN_EQ, "==");
+            } else {
+                printf("Lexer Error: Unexpected character '=' (did you mean '=='?)\n");
+                ungetc(next, source);
+                return create_token(TOKEN_UNKNOWN, "");
+            }
+        }
+
+        if (c == '!') {
+            int next = fgetc(source);
+            if (next == '=') {
+                return create_token(TOKEN_NE, "!=");
+            } else {
+                printf("Lexer Error: Unexpected character '!' (did you mean '!='?)\n");
+                ungetc(next, source);
+                return create_token(TOKEN_UNKNOWN, "");
+            }
         }
 
         // Operators
@@ -77,6 +120,8 @@ Token get_next_token(FILE *source) {
         // Symbols
         if (c == '(') return create_token(TOKEN_LPAREN, "(");
         if (c == ')') return create_token(TOKEN_RPAREN, ")");
+        if (c == '{') return create_token(TOKEN_LBRACE, "{");
+        if (c == '}') return create_token(TOKEN_RBRACE, "}");
         if (c == ';') return create_token(TOKEN_SEMICOLON, ";");
 
         // Unknown character

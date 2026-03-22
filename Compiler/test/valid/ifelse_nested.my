@@ -1,0 +1,18 @@
+int x;
+int y;
+int z;
+
+x <- 15;
+y <- 10;
+
+if (x > y) {
+    if (x > 20) {
+        z <- 1;
+    } else {
+        z <- 2;
+    }
+} else {
+    z <- 3;
+}
+
+print(z);
