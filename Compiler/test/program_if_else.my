@@ -1,0 +1,8 @@
+int x;
+x <- 10;
+
+if (x < 20) {
+    print(x);
+} else {
+    print(x);
+}

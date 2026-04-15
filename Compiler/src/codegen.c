@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "../include/codegen.h"
 #include "../include/token.h"
+#include "../include/ast.h"
 
 int label_count = 0;
 
