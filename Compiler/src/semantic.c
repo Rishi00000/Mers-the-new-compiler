@@ -12,7 +12,7 @@ void check_node(ASTNode* node) {
     switch(node->type) {
 
         case AST_DECLARATION:
-            if (!add_symbol(&table, node->name)) {
+            if (!add_symbol(&table, node->name, "int")) {
                 printf("Semantic Error: Variable '%s' already declared\n", node->name);
             }
             break;
@@ -20,6 +20,11 @@ void check_node(ASTNode* node) {
         case AST_ASSIGNMENT:
             if (!find_symbol(&table, node->name)) {
                 printf("Semantic Error: Variable '%s' not declared\n", node->name);
+            } else {
+                // Update symbol value if assignment is a NUMBER
+                if (node->left && node->left->type == AST_NUMBER) {
+                    update_symbol_value(&table, node->name, node->left->value);
+                }
             }
             break;
 
@@ -56,4 +61,8 @@ void check_node(ASTNode* node) {
 void analyze(ASTNode* root) {
     init_table(&table);
     check_node(root);
+}
+
+SymbolTable* get_symbol_table(void) {
+    return &table;
 }

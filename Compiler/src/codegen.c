@@ -12,67 +12,67 @@ char* gen_label() {
     return buffer;
 }
 
-void generate_code_expr(ASTNode* node) {
+void generate_code_expr(ASTNode* node, FILE* output) {
 
     if (node->type == AST_NUMBER) {
-        printf("    mov rax, %d\n", node->value);
+        fprintf(output, "    mov rax, %d\n", node->value);
         return;
     }
 
     if (node->type == AST_VARIABLE) {
-        printf("    mov rax, [%s]\n", node->name);
+        fprintf(output, "    mov rax, [%s]\n", node->name);
         return;
     }
 
     if (node->type == AST_BINARY) {
 
         // left → rax
-        generate_code_expr(node->left);
-        printf("    push rax\n");
+        generate_code_expr(node->left, output);
+        fprintf(output, "    push rax\n");
 
         // right → rax
-        generate_code_expr(node->right);
-        printf("    mov rbx, rax\n");
+        generate_code_expr(node->right, output);
+        fprintf(output, "    mov rbx, rax\n");
 
-        printf("    pop rax\n");
+        fprintf(output, "    pop rax\n");
 
         // your language mapping: '-' means addition
-        printf("    add rax, rbx\n");
+        fprintf(output, "    add rax, rbx\n");
     }
 
     if (node->type == AST_COMPARISON) {
         // left → rax
-        generate_code_expr(node->left);
-        printf("    push rax\n");
+        generate_code_expr(node->left, output);
+        fprintf(output, "    push rax\n");
 
         // right → rax
-        generate_code_expr(node->right);
-        printf("    mov rbx, rax\n");
+        generate_code_expr(node->right, output);
+        fprintf(output, "    mov rbx, rax\n");
 
-        printf("    pop rax\n");
+        fprintf(output, "    pop rax\n");
 
         // Compare: rax cmp rbx
-        printf("    cmp rax, rbx\n");
+        fprintf(output, "    cmp rax, rbx\n");
 
         // The result is stored in the flags register, not in rax
         // This is handled by the conditional jumps in the if statement
     }
 }
 
-void generate_code_stmt(ASTNode* node) {
+void generate_code_stmt(ASTNode* node, FILE* output) {
 
     if (!node) return;
 
     switch(node->type) {
 
         case AST_ASSIGNMENT:
-            generate_code_expr(node->left);
-            printf("    mov [%s], rax\n", node->name);
+            generate_code_expr(node->left, output);
+            fprintf(output, "    mov [%s], rax\n", node->name);
             break;
 
         case AST_PRINT:
-            generate_code_expr(node->left);
-            printf("    ; print rax (not implemented fully)\n");
+            generate_code_expr(node->left, output);
+            fprintf(output, "    ; print rax (not implemented fully)\n");
             break;
 
         case AST_IF: {
@@ -80,7 +80,7 @@ void generate_code_stmt(ASTNode* node) {
             char* end_label = gen_label();
 
             // Generate comparison
-            generate_code_expr(node->condition);
+            generate_code_expr(node->condition, output);
 
             // Conditional jump based on comparison operator
             const char* jump_instr = "je";  // default to equal
@@ -92,29 +92,29 @@ void generate_code_stmt(ASTNode* node) {
             else if (node->condition->operator == TOKEN_EQ) jump_instr = "jne";   // jump if NOT equal
             else if (node->condition->operator == TOKEN_NE) jump_instr = "je";    // jump if NOT not-equal
 
-            printf("    %s %s\n", jump_instr, else_label);
+            fprintf(output, "    %s %s\n", jump_instr, else_label);
 
             // Generate true branch
             ASTNode* stmt = node->true_branch;
             while (stmt) {
-                generate_code_stmt(stmt);
+                generate_code_stmt(stmt, output);
                 stmt = stmt->next;
             }
 
             if (node->false_branch) {
-                printf("    jmp %s\n", end_label);
-                printf("%s:\n", else_label);
+                fprintf(output, "    jmp %s\n", end_label);
+                fprintf(output, "%s:\n", else_label);
 
                 // Generate false branch
                 stmt = node->false_branch;
                 while (stmt) {
-                    generate_code_stmt(stmt);
+                    generate_code_stmt(stmt, output);
                     stmt = stmt->next;
                 }
 
-                printf("%s:\n", end_label);
+                fprintf(output, "%s:\n", end_label);
             } else {
-                printf("%s:\n", else_label);
+                fprintf(output, "%s:\n", else_label);
             }
 
             break;
@@ -125,32 +125,32 @@ void generate_code_stmt(ASTNode* node) {
     }
 }
 
-void generate_code(ASTNode* root) {
+void generate_code(ASTNode* root, FILE* output) {
 
-    printf("\n=== Assembly ===\n");
+    fprintf(output, "\n=== Assembly ===\n");
 
-    printf("section .data\n");
+    fprintf(output, "section .data\n");
 
     // declare variables
     ASTNode* curr = root->left;
     while (curr) {
         if (curr->type == AST_DECLARATION) {
-            printf("%s: dq 0\n", curr->name);
+            fprintf(output, "%s: dq 0\n", curr->name);
         }
         curr = curr->next;
     }
 
-    printf("\nsection .text\n");
-    printf("global _start\n\n");
-    printf("_start:\n");
+    fprintf(output, "\nsection .text\n");
+    fprintf(output, "global _start\n\n");
+    fprintf(output, "_start:\n");
 
     curr = root->left;
     while (curr) {
-        generate_code_stmt(curr);
+        generate_code_stmt(curr, output);
         curr = curr->next;
     }
 
-    printf("\n    mov rax, 60\n");
-    printf("    mov rdi, 0\n");
-    printf("    syscall\n");
+    fprintf(output, "\n    mov rax, 60\n");
+    fprintf(output, "    mov rdi, 0\n");
+    fprintf(output, "    syscall\n");
 }
