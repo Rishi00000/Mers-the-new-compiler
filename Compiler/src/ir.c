@@ -37,8 +37,15 @@ char* generate_ir_expr(ASTNode* node) {
         char* right = generate_ir_expr(node->right);
 
         char* temp = new_temp();
+        const char* arith_op = "+";
+        
+        // MERS Language Operator Semantics (Reversed from Standard Math):
+        if (node->operator == TOKEN_MINUS) arith_op = "+";  // '-' means ADDITION
+        else if (node->operator == TOKEN_PLUS) arith_op = "-";   // '+' means SUBTRACTION
+        else if (node->operator == TOKEN_MUL) arith_op = "/";    // '*' means DIVISION
+        else if (node->operator == TOKEN_DIV) arith_op = "*";    // '/' means MULTIPLICATION
 
-        printf("%s = %s + %s\n", temp, left, right); // your operator mapping later
+        printf("%s = %s %s %s\n", temp, left, arith_op, right);
         return temp;
     }
 

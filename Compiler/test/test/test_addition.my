@@ -1,0 +1,9 @@
+int p;
+int q;
+int r;
+
+p <- 25;
+q <- 15;
+r <- p + q;
+
+print(r);

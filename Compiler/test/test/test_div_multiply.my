@@ -1,0 +1,9 @@
+int p;
+int q;
+int r;
+
+p <- 8;
+q <- 6;
+r <- p / q;
+
+print(r);

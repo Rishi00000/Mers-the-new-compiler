@@ -1,0 +1,14 @@
+int result1;
+int result2;
+int result3;
+int result4;
+
+result1 <- 5 - 3;
+result2 <- 100 + 25;
+result3 <- 24 * 6;
+result4 <- 72 / 9;
+
+print(result1);
+print(result2);
+print(result3);
+print(result4);

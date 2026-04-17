@@ -1,0 +1,14 @@
+int add_result;
+int sub_result;
+int mul_result;
+int div_result;
+
+add_result <- 15 + 25;
+sub_result <- 100 - 35;
+mul_result <- 6 * 7;
+div_result <- 48 / 6;
+
+print(add_result);
+print(sub_result);
+print(mul_result);
+print(div_result);

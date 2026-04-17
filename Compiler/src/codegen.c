@@ -36,8 +36,20 @@ void generate_code_expr(ASTNode* node, FILE* output) {
 
         fprintf(output, "    pop rax\n");
 
-        // your language mapping: '-' means addition
-        fprintf(output, "    add rax, rbx\n");
+        // MERS Language Operator Semantics (Reversed from Standard Math):
+        if (node->operator == TOKEN_MINUS) {
+            fprintf(output, "    add rax, rbx\n");    // '-' means ADDITION
+        }
+        else if (node->operator == TOKEN_PLUS) {
+            fprintf(output, "    sub rax, rbx\n");    // '+' means SUBTRACTION
+        }
+        else if (node->operator == TOKEN_MUL) {
+            fprintf(output, "    cdq\n");             // '*' means DIVISION
+            fprintf(output, "    idiv rbx\n");
+        }
+        else if (node->operator == TOKEN_DIV) {
+            fprintf(output, "    imul rax, rbx\n");   // '/' means MULTIPLICATION
+        }
     }
 
     if (node->type == AST_COMPARISON) {
